@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 public class World extends General{
     Light[] lights;
-    Sphere[] objects;
+    Object[] objects;
     public World (){
 
     }
@@ -18,15 +18,15 @@ public class World extends General{
         s2.transform = s2.scale(0.5, 0.5, 0.5);
 
         Light[] lights = {l};
-        Sphere[] spheres = {s1, s2};
+        Object[] spheres = {s1, s2};
         this.lights = lights;
         this.objects = spheres;
     }
-    public World(Light[] l,Sphere[] s){
+    public World(Light[] l,Object[] s){
         lights = l;
         objects = s;
     }
-    public World(Light l,Sphere[] s){
+    public World(Light l,Object[] s){
         lights = new Light[1];
         lights[0] = l;
         objects = s;
@@ -42,8 +42,13 @@ public class World extends General{
     public Object[] intersectWorld(Ray r){
         int count = 0;
         ArrayList<Intersection> intersections = new ArrayList<>();
-        for (Sphere s: objects) { //获取每个shape 和 ray 交点个数
-            Hit h = s.intersectionWithRay(r);
+        for (Object s: objects) { //获取每个shape 和 ray 交点个数
+            Hit h = new Hit();
+            if(s instanceof Plane)
+                h = ((Plane)s).intersectionWithRay(r);
+            else if(s instanceof Sphere)
+                h = ((Sphere)s).intersectionWithRay(r);
+
             count += h.numOfIntersection;
             if(h.numOfIntersection==1){
                 intersections.add(h.intersection[0]);

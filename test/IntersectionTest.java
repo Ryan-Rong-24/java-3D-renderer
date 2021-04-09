@@ -25,10 +25,9 @@ class IntersectionTest {
         assertEquals(ansPoint.equals(comp2.point),true);
 
         World d = new World("DEFAULT");
-        Sphere firstObjectInWorld = d.objects[0];
+        Sphere firstObjectInWorld = (Sphere)d.objects[0];
         Intersection i3 = new Intersection(4,r,firstObjectInWorld);
         Computation comp3 = i3.prepareComputation(r);
         assertEquals(comp.isInside,false);
-
     }
 }

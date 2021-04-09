@@ -1,4 +1,5 @@
 import java.io.*;
+import java.awt.image.BufferedImage;
 
 public class App {
     public static void main(String[] args) throws IOException{
@@ -124,18 +125,19 @@ public class App {
         rightSphere.m.diffused = 0.7;
         rightSphere.m.c = new Color(0.5,0,0.5);
 
-        Light lightSource = new Light(new Point(-10,10,-10),new Color(1,1,1));
-        Sphere[] objects = {leftWall,rightWall,floor,leftSphere,middleSphere,rightSphere};
+        Light[] lightSource = {new Light(new Point(-10,10,-10),new Color(0,0,1)),new Light(new Point(-10,9,-10),new Color(0,1,0))};
+        Object[] objects = {leftWall,rightWall,floor,leftSphere,middleSphere,rightSphere};
         World w = new World(lightSource,objects);
 
-        Camera c = new Camera(1000,500,Math.PI/3);
+        Camera c = new Camera(100,50,Math.PI/3);
         Point from = new Point(0,1.5,-5);
         Point to = new Point(0,1,0);
         Vector up = new Vector(0,1,0);
         c.transform = c.viewTransform(from,to,up);
 
         Canvas canvas = c.render(w);
-        canvas.printPPM("thirdImage");
+        canvas.printPPM("masterpiece");
+//        BufferedImage image = ppm(canvas.width, canvas.height, 255, byte[]);
     }
     public static void fourthImage() throws IOException{
         World d = new World("DEFAULT");
@@ -147,5 +149,50 @@ public class App {
 
         Canvas canvas = c.render(d);
         canvas.printPPM("fourthImage");
+    }
+    static public BufferedImage ppm(int width, int height, int maxcolval, byte[] data){
+        if(maxcolval<256){
+            BufferedImage image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+            int r,g,b,k=0,pixel;
+            if(maxcolval==255){                                      // don't scale
+                for(int y=0;y<height;y++){
+                    for(int x=0;(x<width)&&((k+3)<data.length);x++){
+                        r=data[k++] & 0xFF;
+                        g=data[k++] & 0xFF;
+                        b=data[k++] & 0xFF;
+                        pixel=0xFF000000+(r<<16)+(g<<8)+b;
+                        image.setRGB(x,y,pixel);
+                    }
+                }
+            }
+            else{
+                for(int y=0;y<height;y++){
+                    for(int x=0;(x<width)&&((k+3)<data.length);x++){
+                        r=data[k++] & 0xFF;r=((r*255)+(maxcolval>>1))/maxcolval;  // scale to 0..255 range
+                        g=data[k++] & 0xFF;g=((g*255)+(maxcolval>>1))/maxcolval;
+                        b=data[k++] & 0xFF;b=((b*255)+(maxcolval>>1))/maxcolval;
+                        pixel=0xFF000000+(r<<16)+(g<<8)+b;
+                        image.setRGB(x,y,pixel);
+                    }
+                }
+            }
+            return image;
+        }
+        else{
+
+
+            BufferedImage image=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+            int r,g,b,k=0,pixel;
+            for(int y=0;y<height;y++){
+                for(int x=0;(x<width)&&((k+6)<data.length);x++){
+                    r=(data[k++] & 0xFF)|((data[k++] & 0xFF)<<8);r=((r*255)+(maxcolval>>1))/maxcolval;  // scale to 0..255 range
+                    g=(data[k++] & 0xFF)|((data[k++] & 0xFF)<<8);g=((g*255)+(maxcolval>>1))/maxcolval;
+                    b=(data[k++] & 0xFF)|((data[k++] & 0xFF)<<8);b=((b*255)+(maxcolval>>1))/maxcolval;
+                    pixel=0xFF000000+(r<<16)+(g<<8)+b;
+                    image.setRGB(x,y,pixel);
+                }
+            }
+            return image;
+        }
     }
 }

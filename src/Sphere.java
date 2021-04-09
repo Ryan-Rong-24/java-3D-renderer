@@ -8,7 +8,6 @@ public class Sphere extends Shape{
         //几个
         //分别是什么
 
-        double d = transform.determinant(); //确定圆心相对于世界的中心
         Matrix i = (Matrix)transform.inverse()[0];
         Ray n = r.transform(i);
         double a = Math.pow(n.direction.calcMag(),2);
